@@ -1,0 +1,213 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#111018">
+<title>Villager Voice Studio</title>
+<style>
+:root{color-scheme:dark;--bg:#100f16;--panel:#1b1922;--panel2:#24212d;--line:#393342;--pink:#d85bc5;--pink2:#ec7189;--text:#f4f0f6;--muted:#aaa3b2}
+*{box-sizing:border-box}
+body{margin:0;min-height:100vh;padding:18px 14px 36px;background:radial-gradient(ellipse at 15% 0%,#322039 0,transparent 35%),radial-gradient(ellipse at 90% 100%,#18253a 0,transparent 32%),var(--bg);font:15px/1.5 system-ui,-apple-system,Segoe UI,sans-serif;color:var(--text)}
+main{width:min(100%,720px);margin:auto}
+.topbar{height:34px;display:flex;align-items:center;justify-content:space-between;color:#d8d1df;font-size:13px;margin-bottom:12px}
+.brand{display:flex;align-items:center;gap:10px;background:linear-gradient(110deg,#35243c,#28352e 65%,#303021);border:1px solid #44354b;border-radius:15px;padding:18px;margin-bottom:18px;min-height:112px}
+.avatar{width:68px;height:68px;flex:none;border-radius:13px;background:#302b39;display:grid;place-items:center;font-size:38px}
+.brand-copy{min-width:0;flex:1}.brand h1{font-size:clamp(21px,5vw,28px);margin:0 0 2px}.brand p{margin:0;color:#c0b8c8;font-size:12px}
+.tag{display:inline-block;margin-top:9px;padding:5px 10px;border-radius:8px;background:#4a304d;color:#f5c5ef;font-size:11px}
+.panel{background:linear-gradient(150deg,#211e29,#19171f);border:1px solid #38323f;border-radius:17px;padding:18px;margin:14px 0}
+h2{font-size:17px;margin:0 0 13px}
+.upload{border:1px dashed #9d528e;border-radius:13px;padding:17px;background:#211b29}
+.upload-head{display:flex;align-items:center;justify-content:space-between;gap:10px}
+.upload strong{font-size:16px}.upload small{display:block;color:var(--muted);font-size:12px;margin-top:3px}
+.upload-icon{font-size:26px;color:#e47bc8}
+input[type=file]{display:none}
+.action-row{display:flex;gap:10px;flex-wrap:wrap;margin-top:13px}
+button,.filebtn{border:1px solid #70466d;background:#3a2940;color:white;padding:11px 15px;border-radius:10px;font:600 14px system-ui;cursor:pointer}
+button:hover,.filebtn:hover{filter:brightness(1.14)}
+button:disabled{opacity:.45;cursor:not-allowed}
+.secondary{background:#28252f;border-color:#49414f}
+.stop{background:#492b35;border-color:#71414f}
+.filebtn{display:inline-flex;align-items:center;gap:7px}
+.fileinfo{color:#c2bac9;font-size:13px;margin-top:12px;overflow-wrap:anywhere}
+audio{width:100%;margin-top:13px;height:42px}
+.recordbox{border:1px solid #393340;border-radius:13px;padding:15px;margin-top:13px;background:#201e26}
+.record-top{display:flex;align-items:center;justify-content:space-between;gap:10px}
+.record-top small{display:block;color:var(--muted)}
+.rec-dot{width:19px;height:19px;border-radius:50%;background:#e44d63;box-shadow:0 0 0 5px #3c303a;border:2px solid #f7dce5}
+.primary{width:100%;border:0;background:linear-gradient(100deg,#b832c4,#e56a87);padding:14px;font-size:15px;box-shadow:0 5px 18px #c23b9b30}
+.status{min-height:22px;color:#e8a5d9;font-size:13px;margin-top:12px}
+.result{display:none}.result.show{display:block}
+.result-title{display:flex;justify-content:space-between;align-items:center;gap:8px}
+.result-title span{color:#9fdf9d;font-size:12px}
+.hint{color:var(--muted);font-size:12px;margin:8px 0 0}
+footer{text-align:center;color:#817989;font-size:12px;padding:16px 4px}
+@media(max-width:420px){body{padding:12px 10px 28px}.brand{padding:14px}.avatar{width:56px;height:56px;font-size:32px}.panel{padding:14px}.action-row button,.action-row .filebtn{flex:1;justify-content:center}}
+</style>
+</head>
+<body>
+<main>
+  <div class="topbar"><span>☰ &nbsp; VOICE STUDIO</span><span>VILLAGER MODE</span></div>
+  <header class="brand">
+    <div class="avatar">🧑‍🌾</div>
+    <div class="brand-copy">
+      <h1>Villager Voice</h1>
+      <p>Ubah suara manusia menjadi suara bergaya Villager.</p>
+      <span class="tag">VOICE CONVERTER</span>
+    </div>
+  </header>
+
+  <section class="panel">
+    <h2>Masukkan audio</h2>
+    <div class="upload">
+      <div class="upload-head">
+        <div><strong>Upload Audio</strong><small>Pilih file MP3, WAV, M4A, atau audio lain yang didukung.</small></div>
+        <span class="upload-icon">⇧</span>
+      </div>
+      <div class="action-row">
+        <label class="filebtn" for="audioFile">＋ Pilih Audio</label>
+        <input id="audioFile" type="file" accept="audio/*">
+      </div>
+      <div id="fileInfo" class="fileinfo">Belum ada audio dipilih.</div>
+      <audio id="sourceAudio" controls></audio>
+    </div>
+
+    <div class="recordbox">
+      <div class="record-top">
+        <div><strong>Record Audio</strong><small>Rekam suara langsung dari mikrofon.</small></div>
+        <span class="rec-dot"></span>
+      </div>
+      <div class="action-row">
+        <button id="recordBtn" class="secondary">● Mulai Rekam</button>
+        <button id="stopRecordBtn" class="stop" disabled>■ Stop Rekam</button>
+      </div>
+    </div>
+  </section>
+
+  <section class="panel">
+    <h2>Ubah suara</h2>
+    <p class="hint">Tekan tombol di bawah untuk membuat versi suara Villager dari audio yang dipilih.</p>
+    <button id="previewBtn" class="primary" disabled>♫ &nbsp; Generate Villager Voice</button>
+    <div id="status" class="status" role="status">Pilih file audio atau rekam suara terlebih dahulu.</div>
+  </section>
+
+  <section id="resultPanel" class="panel result">
+    <div class="result-title"><h2>Hasil suara</h2><span>✓ Selesai</span></div>
+    <audio id="resultAudio" controls></audio>
+    <div class="action-row">
+      <button id="downloadBtn" class="primary">⬇ Download WAV</button>
+    </div>
+  </section>
+  <footer>Diproses langsung di browser • Tidak perlu login • Tidak ada fitur Pro</footer>
+</main>
+<script>
+(() => {
+  const $ = id => document.getElementById(id);
+  let audioBuffer=null, audioContext=null, mediaRecorder=null, recordedChunks=[], micStream=null, resultBlob=null, resultUrl=null, sourceUrl=null;
+
+  async function getContext(){
+    if(!audioContext) audioContext=new (window.AudioContext||window.webkitAudioContext)();
+    if(audioContext.state==='suspended') await audioContext.resume();
+    return audioContext;
+  }
+
+  function setFile(file){
+    if(!file)return;
+    if(sourceUrl)URL.revokeObjectURL(sourceUrl);
+    sourceUrl=URL.createObjectURL(file);
+    $('sourceAudio').src=sourceUrl;
+    $('fileInfo').textContent=file.name+' • '+(file.size/1024/1024).toFixed(2)+' MB';
+    $('status').textContent='Memuat audio...';
+    const reader=new FileReader();
+    reader.onload=async()=>{
+      try{
+        const ctx=await getContext();
+        audioBuffer=await ctx.decodeAudioData(reader.result.slice(0));
+        $('previewBtn').disabled=false;
+        $('status').textContent='Audio siap diproses.';
+        $('resultPanel').classList.remove('show');
+      }catch(e){
+        audioBuffer=null;$('previewBtn').disabled=true;
+        $('status').textContent='Audio tidak dapat dibaca. Coba file MP3 atau WAV.';
+      }
+    };
+    reader.readAsArrayBuffer(file);
+  }
+  $('audioFile').addEventListener('change',e=>setFile(e.target.files[0]));
+
+  $('recordBtn').addEventListener('click',async()=>{
+    try{
+      micStream=await navigator.mediaDevices.getUserMedia({audio:true});
+      recordedChunks=[];
+      const mime=MediaRecorder.isTypeSupported('audio/webm;codecs=opus')?'audio/webm;codecs=opus':'audio/webm';
+      mediaRecorder=new MediaRecorder(micStream,{mimeType:mime});
+      mediaRecorder.ondataavailable=e=>{if(e.data.size)recordedChunks.push(e.data)};
+      mediaRecorder.onstop=()=>{
+        const blob=new Blob(recordedChunks,{type:mediaRecorder.mimeType||'audio/webm'});
+        const ext=blob.type.includes('mp4')?'m4a':'webm';
+        setFile(new File([blob],'rekaman-villager.'+ext,{type:blob.type}));
+        micStream.getTracks().forEach(t=>t.stop());micStream=null;
+      };
+      mediaRecorder.start();
+      $('recordBtn').disabled=true;$('stopRecordBtn').disabled=false;
+      $('status').textContent='Sedang merekam suara...';
+    }catch(e){$('status').textContent='Mikrofon tidak tersedia. Izinkan akses mikrofon atau upload audio.'}
+  });
+  $('stopRecordBtn').addEventListener('click',()=>{
+    if(mediaRecorder&&mediaRecorder.state!=='inactive')mediaRecorder.stop();
+    $('recordBtn').disabled=false;$('stopRecordBtn').disabled=true;
+    $('status').textContent='Rekaman selesai, memuat audio...';
+  });
+
+  function makeGraph(ctx,buffer,destination){
+    const source=ctx.createBufferSource();source.buffer=buffer;
+    source.playbackRate.value=Math.pow(2,-4/12);
+    const hp=ctx.createBiquadFilter();hp.type='highpass';hp.frequency.value=145;
+    const nasal=ctx.createBiquadFilter();nasal.type='peaking';nasal.frequency.value=1150;nasal.Q.value=1.15;nasal.gain.value=7;
+    const lp=ctx.createBiquadFilter();lp.type='lowpass';lp.frequency.value=3100;
+    const mid=ctx.createBiquadFilter();mid.type='peaking';mid.frequency.value=1750;mid.Q.value=.9;mid.gain.value=4;
+    const comp=ctx.createDynamicsCompressor();comp.threshold.value=-23;comp.ratio.value=4;comp.attack.value=.005;comp.release.value=.13;
+    const shaper=ctx.createWaveShaper();const curve=new Float32Array(2048);
+    for(let i=0;i<curve.length;i++){const x=i*2/(curve.length-1)-1;curve[i]=1.12*x/(1+.12*Math.abs(x))}
+    shaper.curve=curve;shaper.oversample='2x';
+    source.connect(hp);hp.connect(nasal);nasal.connect(lp);lp.connect(mid);mid.connect(comp);comp.connect(shaper);shaper.connect(destination);
+    return source;
+  }
+
+  function wavBlob(buffer){
+    const channels=buffer.numberOfChannels,len=buffer.length,rate=buffer.sampleRate,dataSize=len*channels*2;
+    const ab=new ArrayBuffer(44+dataSize),v=new DataView(ab);
+    const str=(o,s)=>{for(let i=0;i<s.length;i++)v.setUint8(o+i,s.charCodeAt(i))};
+    str(0,'RIFF');v.setUint32(4,36+dataSize,true);str(8,'WAVE');str(12,'fmt ');v.setUint32(16,16,true);v.setUint16(20,1,true);v.setUint16(22,channels,true);v.setUint32(24,rate,true);v.setUint32(28,rate*channels*2,true);v.setUint16(32,channels*2,true);v.setUint16(34,16,true);str(36,'data');v.setUint32(40,dataSize,true);
+    const ch=Array.from({length:channels},(_,i)=>buffer.getChannelData(i));let o=44;
+    for(let i=0;i<len;i++)for(let c=0;c<channels;c++){const s=Math.max(-1,Math.min(1,ch[c][i]));v.setInt16(o,s<0?s*32768:s*32767,true);o+=2}
+    return new Blob([ab],{type:'audio/wav'});
+  }
+
+  $('previewBtn').addEventListener('click',async()=>{
+    if(!audioBuffer)return;
+    $('previewBtn').disabled=true;$('status').textContent='Sedang membuat suara Villager...';
+    try{
+      const rate=Math.pow(2,-4/12),length=Math.ceil(audioBuffer.length/rate);
+      const offline=new OfflineAudioContext(audioBuffer.numberOfChannels,length,audioBuffer.sampleRate);
+      const source=makeGraph(offline,audioBuffer,offline.destination);source.start(0);
+      const rendered=await offline.startRendering();
+      resultBlob=wavBlob(rendered);
+      if(resultUrl)URL.revokeObjectURL(resultUrl);
+      resultUrl=URL.createObjectURL(resultBlob);
+      $('resultAudio').src=resultUrl;
+      $('resultPanel').classList.add('show');
+      $('status').textContent='Berhasil! Dengarkan hasilnya atau download WAV.';
+    }catch(e){$('status').textContent='Gagal memproses audio. Coba audio yang lebih pendek.'}
+    finally{$('previewBtn').disabled=false}
+  });
+  $('downloadBtn').addEventListener('click',()=>{
+    if(!resultBlob)return;
+    const url=URL.createObjectURL(resultBlob),a=document.createElement('a');
+    a.href=url;a.download='villager-voice.wav';document.body.appendChild(a);a.click();a.remove();
+    setTimeout(()=>URL.revokeObjectURL(url),1500);
+  });
+})();
+</script>
+</body>
+</html>
